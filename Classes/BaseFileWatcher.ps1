@@ -1,4 +1,4 @@
-class FileWatcherBase
+class BaseFileWatcher
 {
     [DscProperty(Mandatory)]
     [String[]]
@@ -38,7 +38,7 @@ class FileWatcherBase
         }
     } 
        
-    [FileWatcherBase]Get()
+    [BaseFileWatcher]Get()
     {        
         $this.ProcessStartTime = $this.GetProcessStartTime()
         $this.LastWriteTime = $this.GetLastWriteTime()

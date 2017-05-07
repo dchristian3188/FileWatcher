@@ -1,5 +1,5 @@
 [DscResource()]
-class ServiceFileWatcher : FileWatcherBase
+class ServiceFileWatcher : BaseFileWatcher
 {
 
     [DscProperty(Key)]
