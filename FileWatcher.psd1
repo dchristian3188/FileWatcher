@@ -21,19 +21,19 @@ ModuleVersion = '1.0'
 GUID = 'fb0418e0-92f1-4eec-b3a3-67b4e13963bf'
 
 # Author of this module
-Author = 'bigba_000'
+Author = 'David Christian'
 
 # Company or vendor of this module
-CompanyName = 'Unknown'
+CompanyName = 'OverPoweredShell.com'
 
 # Copyright statement for this module
-Copyright = '(c) 2017 bigba_000. All rights reserved.'
+Copyright = '(c) 2017 David Christian. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'Watches a text file for changes. Takes action based on changes'
 
 # Minimum version of the Windows PowerShell engine required by this module
-# PowerShellVersion = ''
+ PowerShellVersion = '5'
 
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''
@@ -81,7 +81,7 @@ VariablesToExport = '*'
 AliasesToExport = '*'
 
 # DSC resources to export from this module
-# DscResourcesToExport = @()
+ DscResourcesToExport = '*'
 
 # List of all modules packaged with this module
 # ModuleList = @()

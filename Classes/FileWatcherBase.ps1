@@ -1,16 +1,10 @@
-[DscResource()]
-class SmartSeviceRestart
+class FileWatcherBase
 {
-
-    [DscProperty(Key)]
-    [string]
-    $ServiceName
-
     [DscProperty(Mandatory)]
     [String[]]
     $Path
 
-    [DscProperty(Mandatory)]
+    [DscProperty()]
     [String]
     $Filter
     
@@ -44,7 +38,7 @@ class SmartSeviceRestart
         }
     } 
        
-    [SmartSeviceRestart]Get()
+    [FileWatcherBase]Get()
     {        
         $this.ProcessStartTime = $this.GetProcessStartTime()
         $this.LastWriteTime = $this.GetLastWriteTime()
