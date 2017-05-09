@@ -17,6 +17,6 @@ Description = 'Watches a text file for changes. Takes action based on changes'
 
  PowerShellVersion = '5.0'
 
- DscResourcesToExport = @('ServiceFileWatcher')
+ DscResourcesToExport = @('_ResourcesToExport_')
 
 }
