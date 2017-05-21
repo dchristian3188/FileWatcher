@@ -7,10 +7,10 @@ class SmartSeviceRestart
     $ServiceName
 
     [DscProperty(Mandatory)]
-    [String[]]
+    [string[]]
     $Path
 
-    [DscProperty(Mandatory)]
+    [DscProperty()]
     [String]
     $Filter
     
@@ -22,35 +22,29 @@ class SmartSeviceRestart
     [Nullable[datetime]] 
     $LastWriteTime
 
-    [Bool] Test()
-    {        
-        If (-not($this.ProcessStartTime))
-        {
-            $this.ProcessStartTime = $this.GetProcessStartTime()
-        }
-
-        If (-not($this.LastWriteTime))
-        {
-            $this.LastWriteTime = $this.GetLastWriteTime()
-        }
-
-        If ($this.ProcessStartTime -ge $this.LastWriteTime)
-        {
-            Return $true
-        }
-        Else
-        {
-            Return $false
-        }
-    } 
-       
     [SmartSeviceRestart]Get()
     {        
         $this.ProcessStartTime = $this.GetProcessStartTime()
         $this.LastWriteTime = $this.GetLastWriteTime()
-        Return $this
+        return $this
     } 
-    
+
+    [bool]Test()
+    {        
+        $this.ProcessStartTime = $this.GetProcessStartTime()
+        $this.LastWriteTime = $this.GetLastWriteTime()
+
+        Write-Verbose -Message "PID: [$($this.ProcessStartTime)]. File Last Write Time: [$($this.LastWriteTime)]"
+        if ($this.ProcessStartTime -gt $this.LastWriteTime)
+        {
+            return $true
+        }
+        else
+        {
+            return $false
+        }
+    } 
+       
     [Void]Set()
     {
         Restart-Service -Name $this.ServiceName -Force
@@ -59,7 +53,7 @@ class SmartSeviceRestart
     [DateTime]GetProcessStartTime()
     {
         $service = Get-CimInstance -ClassName Win32_Service -Filter "Name='$($this.ServiceName)'" -ErrorAction Stop
-        If (-not($service))
+        if (-not($service))
         {
             Throw "Could not find a service with name: $($this.ServiceName)"
         }
@@ -67,17 +61,17 @@ class SmartSeviceRestart
         Write-Verbose -Message "Checking for process id: $($service.ProcessId)"
         $processInfo = (Get-CimInstance win32_process -Filter "processid='$($service.ProcessId)'")
         
-        If ($processInfo.ProcessId -eq 0)
+        if ($processInfo.ProcessId -eq 0)
         {
             Write-Verbose -Message "Could not find a running process, setting start time to min date value"
             $processStart = [datetime]::MinValue
         }
-        Else
+        else
         {
             $processStart = $processInfo.CreationDate
             Write-Verbose -Message "Process started at: $($processStart)"
         }
-        Return $processStart
+        return $processStart
     }
 
     [DateTime]GetLastWriteTime()
@@ -88,7 +82,7 @@ class SmartSeviceRestart
         }
 
         Write-Verbose -Message "Checking Path: $($this.Path -join ", ")"
-        If ($this.Filter)
+        if ($this.Filter)
         {
             Write-Verbose -Message "Using Filter: $($this.Filter)"
             $getSplat["Filter"] = $this.Filter
