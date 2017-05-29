@@ -102,3 +102,13 @@ class SmartSeviceRestart
         return $lastWrite
     }
 }
+
+
+$ogVerbosePerf = $VerbosePreference
+$VerbosePreference = 'Continue'
+
+$sw = [SmartSeviceRestart]::new()
+$sw.ServiceName = 'Spooler'
+$sw.Path = 'C:\Temp\test.txt'
+$sw.Test()
+$VerbosePreference = $ogVerbosePerf
