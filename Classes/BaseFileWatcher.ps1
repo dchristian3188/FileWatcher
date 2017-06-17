@@ -16,7 +16,14 @@ class BaseFileWatcher
     [Nullable[datetime]]
     $LastWriteTime
 
-    [Bool] Test()
+    [BaseFileWatcher]Get()
+    {
+        $this.ProcessStartTime = $this.GetProcessStartTime()
+        $this.LastWriteTime = $this.GetLastWriteTime()
+        Return $this
+    }
+
+    [Bool]Test()
     {
         If (-not($this.ProcessStartTime))
         {
@@ -38,13 +45,6 @@ class BaseFileWatcher
             Write-Verbose -Message "One or more files has a later start time. The process will be restarted."
             Return $false
         }
-    }
-
-    [BaseFileWatcher]Get()
-    {
-        $this.ProcessStartTime = $this.GetProcessStartTime()
-        $this.LastWriteTime = $this.GetLastWriteTime()
-        Return $this
     }
 
     [DateTime]GetLastWriteTime()
