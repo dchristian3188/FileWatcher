@@ -11,7 +11,7 @@ param(
 
 Describe "$($ModuleName) Unit Tests" {
     BeforeAll {
-        Import-Module (Join-Path -Path $ModuleRoot -ChildPath "$($ModuleName).psm1"
+        Import-Module (Join-Path -Path $ModuleRoot -ChildPath "$($ModuleName).psm1")
     }
 
     AfterAll {

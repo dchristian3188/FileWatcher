@@ -1,4 +1,4 @@
-task . Clean, Build, Pester
+task . Clean, Build, Pester, GenerateGraph
 task CreateManifest copyPSD, UpdateDSCResourceToExport
 task Build Compile, CreateManifest
 
@@ -89,4 +89,10 @@ task Pester {
 
     Invoke-Pester @{ Path = '.\Tests\*'; Parameters = $params} -OutputFile $resultFile -OutputFormat NUnitxml
 }
+
+task GenerateGraph -if (Test-Path -Path 'psgraph.ps1') {
+    $graphPath = Join-Path -Path $(Split-Path -Path $script:PsmPath) -ChildPath "$($script:ModuleName).png"
+    .\psgraph.ps1 -OutputPath $graphPath  -Quiet > $null
+}
+
 
