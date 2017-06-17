@@ -1,12 +1,20 @@
-$moduleRoot = Resolve-Path "$PSScriptRoot\.."
-$moduleName = Split-Path $moduleRoot -Leaf
+[CmdletBinding()]
+    param(
+        [Parameter()]
+        [string]
+        $ModuleRoot = (Resolve-Path "$PSScriptRoot\.."),
 
-Describe "General project validation: $moduleName" {
+        [Parameter()]
+        [string]
+        $ModuleName = (Split-Path (Resolve-Path "$PSScriptRoot\..") -Leaf)
+    )
 
-    $scripts = Get-ChildItem $moduleRoot -Include *.ps1, *.psm1, *.psd1 -Recurse
+Describe "General project validation: $ModuleName" {
+
+    $scripts = Get-ChildItem $ModuleRoot -Include *.ps1, *.psm1, *.psd1 -Recurse
 
     # TestCases are splatted to the script so we need hashtables
-    $testCase = $scripts | Foreach-Object {@{file = $_}}         
+    $testCase = $scripts | Foreach-Object {@{file = $_}}
     It "Script <file> should be valid powershell" -TestCases $testCase {
         param($file)
 
@@ -18,7 +26,7 @@ Describe "General project validation: $moduleName" {
         $errors.Count | Should Be 0
     }
 
-    It "Module '$moduleName' can import cleanly" {
-        {Import-Module (Join-Path $moduleRoot "$moduleName.psm1") -force } | Should Not Throw
+    It "Module [$ModuleName] can import cleanly from [$ModuleRoot]" {
+        {Import-Module (Join-Path $ModuleRoot "$ModuleName.psm1") -force } | Should Not Throw
     }
 }
