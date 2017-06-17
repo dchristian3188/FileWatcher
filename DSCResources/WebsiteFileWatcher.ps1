@@ -1,4 +1,4 @@
-get-wmiobject -class win32_process -filter "name='w3wp.exe'" | Select-Object Name, ProcessId, @{n='AppPool';e={$_.GetOwner().user}}
+get-wmiobject -class win32_process -filter "name='w3wp.exe'" | Select-Object Name, ProcessId, @{n = 'AppPool'; e = {$_.GetOwner().user}}
 [DscResource()]
 class WebSiteFileWatcher : BaseFileWatcher
 {
@@ -11,22 +11,22 @@ class WebSiteFileWatcher : BaseFileWatcher
     {
         $runningProcs = Get-Process -Name $this.ProcessName -ErrorAction SilentlyContinue
 
-        If($runningProcs)
+        If ($runningProcs)
         {
             Write-Verbose -Message "Stopping running Processes $($runningProcs.ID -join ', ')"
-            $runningProcs | 
+            $runningProcs |
                 Stop-Process -ErrorAction Stop -Force
         }
 
         Write-Verbose -Message "Starting Process [$($this.ProcessName)] at path [$($this.ProcessPath)] with args [$($this.ProcessStartArgs)]"
         Start-Process -FilePath $this.ProcessPath -ArgumentList $this.ProcessStartArgs -PassThru
     }
-    
+
     [DateTime]GetProcessStartTime()
     {
         Write-Verbose -Message "Checking for process Name: $($this.ProcessName)"
         $processInfo = (Get-CimInstance win32_process -Filter "name='$($this.ProcessName)'")
-        
+
         If ($processInfo.ProcessId -eq 0)
         {
             Write-Verbose -Message "Could not find a running process, setting start time to min date value"
@@ -39,7 +39,5 @@ class WebSiteFileWatcher : BaseFileWatcher
         }
         Return $processStart
     }
-
-
 
 }

@@ -1,7 +1,9 @@
 $script:ModuleName = Split-Path -Path $PSScriptRoot -Leaf
+$script:ModuleRoot = $PSScriptRoot
 $script:OutPutFolder = "Output"
-$script:ImportFolders = @('Public','Internal','Classes')
-$script:PsmPath = Join-Path $PSScriptRoot -ChildPath "Output\$($script:ModuleName)"
+$script:ImportFolders = @('Public','Internal','Classes','DSCResources')
+$script:PsmPath = Join-Path $PSScriptRoot -ChildPath "Output\$($script:ModuleName)\$($script:ModuleName).psm1"
+$script:DSCResourceFolder = 'DSCResources'
 
 
 task "Clean" {
@@ -13,23 +15,62 @@ task "Clean" {
     Remove-Item -Path "$($script:OutPutFolder)\*" -Force -Recurse
 }
 
-task Compile {
+$compileParams = @{
+    Inputs = {
+        foreach($folder in $script:ImportFolders)
+        {
+            Get-ChildItem -Path $folder -Recurse -File -Filter '*.ps1'
+        }
+    }
+
+    Output = {
+        $script:PsmPath
+    }
+}
+
+
+task Compile @compileParams {
     if(Test-Path -Path $script:PsmPath)
     {
         Remove-Item -Path $script:PsmPath -Recurse -Force
     }
+    New-Item -Path $script:PsmPath -Force > $null
 
     foreach($folder in $script:ImportFolders)
     {
-        $currentFolder = Join-Path -Path $script:OutPutFolder -ChildPath $folder
+        $currentFolder = Join-Path -Path $script:ModuleRoot -ChildPath $folder
+        Write-Verbose -Message "Checking folder [$currentFolder]"
+
         if(Test-Path -Path $currentFolder)
         {
-            Get-ChildItem -File | % {
-                Get-Content -Path $PSItem.FullName >> $script:PsmPath 
+            $files =  Get-ChildItem -Path $currentFolder -File -Filter '*.ps1'
+            foreach($file in $files)
+            {
+                Write-Verbose -Message "Adding $($file.FullName)"
+                Get-Content -Path $file.FullName >> $script:PsmPath
             }
-            
         }
     }
-    
+}
+
+task CopyPSD {
+    $copy = @{
+        Path = "$($script:ModuleName).psd1"
+        Destination = "Output\$($script:ModuleName)\$($script:ModuleName).psd1"
+        Force = $true
+    }
+    Copy-Item @copy
+}
+
+task UpdateDSCResourceToExport -if (Test-Path -Path $script:DSCResourceFolder) {
+    $resources = (Get-ChildItem -Path $script:DSCResourceFolder |
+        Select-Object -ExpandProperty BaseName) -join "', "
+
+    $resources = "'{0}'" -f $resources
+
+    (Get-Content -Path "Output\$($script:ModuleName)\$($script:ModuleName).psd1").Replace('_ResourcesToExport_',$resources)
 
 }
+
+task CreateManifest copyPSD, UpdateDSCResourceToExport
+task . clean, compile, CreateManifest
