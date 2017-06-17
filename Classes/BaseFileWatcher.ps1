@@ -25,17 +25,17 @@ class BaseFileWatcher
 
     [Bool]Test()
     {
-        If (-not($this.ProcessStartTime))
+        if (-not($this.ProcessStartTime))
         {
             $this.ProcessStartTime = $this.GetProcessStartTime()
         }
 
-        If (-not($this.LastWriteTime))
+        if (-not($this.LastWriteTime))
         {
             $this.LastWriteTime = $this.GetLastWriteTime()
         }
 
-        If ($this.ProcessStartTime -ge $this.LastWriteTime)
+        if ($this.ProcessStartTime -ge $this.LastWriteTime)
         {
             Write-Verbose -Message "Process has a later start time. No action will be taken"
             Return $true
@@ -55,7 +55,7 @@ class BaseFileWatcher
         }
 
         Write-Verbose -Message "Checking Path: $($this.Path -join ", ")"
-        If ($this.Filter)
+        if ($this.Filter)
         {
             Write-Verbose -Message "Using Filter: $($this.Filter)"
             $getSplat["Filter"] = $this.Filter

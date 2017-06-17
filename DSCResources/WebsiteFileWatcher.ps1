@@ -34,7 +34,7 @@ class WebSiteFileWatcher : BaseFileWatcher
             Select-Object *, $AppPoolName |
             Where-Object -FilterScript {$PSItem.AppPoolName -eq $($websiteInfo.applicationPool)}
 
-        If (($processInfo.ProcessId -eq 0) -or $processInfo -eq $null)
+        if (($processInfo.ProcessId -eq 0) -or $processInfo -eq $null)
         {
             Write-Verbose -Message "Could not find a running process, setting start time to min date value"
             $processStart = [datetime]::MinValue

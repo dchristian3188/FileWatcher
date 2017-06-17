@@ -13,7 +13,7 @@ $script:DSCResourceFolder = 'DSCResources'
 
 
 task "Clean" {
-    If (-not(Test-Path $script:OutPutFolder))
+    if (-not(Test-Path $script:OutPutFolder))
     {
         New-Item -ItemType Directory -Path $script:OutPutFolder > $null
     }

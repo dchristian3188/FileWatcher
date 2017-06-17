@@ -13,24 +13,24 @@ class SmartSeviceRestart
     [DscProperty()]
     [String]
     $Filter
-    
+
     [DscProperty(NotConfigurable)]
-    [Nullable[datetime]] 
+    [Nullable[datetime]]
     $ProcessStartTime
 
     [DscProperty(NotConfigurable)]
-    [Nullable[datetime]] 
+    [Nullable[datetime]]
     $LastWriteTime
 
     [SmartSeviceRestart]Get()
-    {        
+    {
         $this.ProcessStartTime = $this.GetProcessStartTime()
         $this.LastWriteTime = $this.GetLastWriteTime()
         return $this
-    } 
+    }
 
     [bool]Test()
-    {        
+    {
         $this.ProcessStartTime = $this.GetProcessStartTime()
         $this.LastWriteTime = $this.GetLastWriteTime()
 
@@ -43,13 +43,13 @@ class SmartSeviceRestart
         {
             return $false
         }
-    } 
-       
+    }
+
     [Void]Set()
     {
         Restart-Service -Name $this.ServiceName -Force
     }
-    
+
     [DateTime]GetProcessStartTime()
     {
         $service = Get-CimInstance -ClassName Win32_Service -Filter "Name='$($this.ServiceName)'" -ErrorAction Stop
@@ -60,7 +60,7 @@ class SmartSeviceRestart
 
         Write-Verbose -Message "Checking for process id: $($service.ProcessId)"
         $processInfo = (Get-CimInstance win32_process -Filter "processid='$($service.ProcessId)'")
-        
+
         if ($processInfo.ProcessId -eq 0)
         {
             Write-Verbose -Message "Could not find a running process, setting start time to min date value"
@@ -91,7 +91,7 @@ class SmartSeviceRestart
         $lastWrite = Get-ChildItem @getSplat |
             Sort-Object -Property LastWriteTime |
             Select-Object -ExpandProperty LastWriteTime -First 1
-        
+
         if (-not($lastWrite))
         {
             Write-Verbose -Message "No lastwrite time found. Setting to min date"

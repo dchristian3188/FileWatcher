@@ -15,7 +15,7 @@ class ServiceFileWatcher : BaseFileWatcher
     [DateTime]GetProcessStartTime()
     {
         $service = Get-CimInstance -ClassName Win32_Service -Filter "Name='$($this.ServiceName)'" -ErrorAction Stop
-        If (-not($service))
+        if (-not($service))
         {
             Throw "Could not find a service with name: $($this.ServiceName)"
         }
@@ -23,7 +23,7 @@ class ServiceFileWatcher : BaseFileWatcher
         Write-Verbose -Message "Checking for process id: $($service.ProcessId)"
         $processInfo = (Get-CimInstance win32_process -Filter "processid='$($service.ProcessId)'")
 
-        If ($processInfo.ProcessId -eq 0)
+        if ($processInfo.ProcessId -eq 0)
         {
             Write-Verbose -Message "Could not find a running process, setting start time to min date value"
             $processStart = [datetime]::MinValue

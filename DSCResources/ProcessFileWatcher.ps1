@@ -18,7 +18,7 @@ class ProcessFileWatcher : BaseFileWatcher
     {
         $runningProcs = Get-CimInstance win32_process -Filter "name='$($this.ProcessName)'"
 
-        If ($runningProcs)
+        if ($runningProcs)
         {
             Write-Verbose -Message "Stopping running Processes $($runningProcs.ProcessId -join ', ')"
             Stop-Process -ID $runningProcs.ProcessId -ErrorAction Stop -Force
@@ -42,7 +42,7 @@ class ProcessFileWatcher : BaseFileWatcher
         Write-Verbose -Message "Checking for process Name: $($this.ProcessName)"
         $processInfo = (Get-CimInstance win32_process -Filter "name='$($this.ProcessName)'")
 
-        If ($processInfo.ProcessId -eq $null)
+        if ($processInfo.ProcessId -eq $null)
         {
             Write-Verbose -Message "Could not find a running process, setting start time to min date value"
             $processStart = [datetime]::MinValue
