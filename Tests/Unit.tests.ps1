@@ -11,17 +11,34 @@ param(
 
 Describe "$($ModuleName) Unit Tests" {
     BeforeAll {
-        Import-Module (Join-Path -Path $ModuleRoot -ChildPath "$($ModuleName).psm1")
+        <#
+             Super Dirty...
+             Not sure how else to load the classes....
+        #>
+        $modulePath = Join-Path -Path $ModuleRoot -ChildPath "$($ModuleName).psm1"
+        Write-Verbose -Message "Invoke module contents of  [$psmPath]"
+
+        $scriptBody = Get-Content -Path $modulePath |
+            Out-String
+        Invoke-Expression -Command $scriptBody
+
+        $resourcesFolder = Resolve-Path -Path "$PSScriptRoot\..\DSCResources"
+        $resources = Get-ChildItem -Path $resourcesFolder -File |
+            Select-Object -ExpandProperty BaseName
     }
 
     AfterAll {
-        Remove-Module -Name $ModuleName
     }
 
-    Context "Service File Watcher Tests" {
-        It "Creates a new object" {
-            {$serviceFW = [ServiceFileWatcher]::new()} | Should not throw
+    foreach ($resource in $resources)
+    {
+        Context "$resource Tests" {
+            It "$resource Creates a new object" {
+                {$fw = New-Object -TypeName $resource} | Should not throw
+            }
         }
     }
+
+
 
 }
