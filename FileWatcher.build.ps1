@@ -87,6 +87,6 @@ task Pester {
         ModuleName = $script:ModuleName
      }
 
-    Invoke-Pester @{ Path = '.\Tests\*'; Parameters = $params} -OutputFile $resultFile
+    Invoke-Pester @{ Path = '.\Tests\*'; Parameters = $params} -OutputFile $resultFile -OutputFormat NUnitxml
 }
 

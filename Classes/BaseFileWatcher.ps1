@@ -7,17 +7,17 @@ class BaseFileWatcher
     [DscProperty()]
     [String]
     $Filter
-    
+
     [DscProperty(NotConfigurable)]
-    [Nullable[datetime]] 
+    [Nullable[datetime]]
     $ProcessStartTime
 
     [DscProperty(NotConfigurable)]
-    [Nullable[datetime]] 
+    [Nullable[datetime]]
     $LastWriteTime
 
     [Bool] Test()
-    {        
+    {
         If (-not($this.ProcessStartTime))
         {
             $this.ProcessStartTime = $this.GetProcessStartTime()
@@ -30,21 +30,23 @@ class BaseFileWatcher
 
         If ($this.ProcessStartTime -ge $this.LastWriteTime)
         {
+            Write-Verbose -Message "Process has a later start time. No action will be taken"
             Return $true
         }
         Else
         {
+            Write-Verbose -Message "One or more files has a later start time. The process will be restarted."
             Return $false
         }
-    } 
-       
+    }
+
     [BaseFileWatcher]Get()
-    {        
+    {
         $this.ProcessStartTime = $this.GetProcessStartTime()
         $this.LastWriteTime = $this.GetLastWriteTime()
         Return $this
-    } 
-    
+    }
+
     [DateTime]GetLastWriteTime()
     {
         $getSplat = @{
@@ -62,7 +64,7 @@ class BaseFileWatcher
         $lastWrite = Get-ChildItem @getSplat |
             Sort-Object -Property LastWriteTime |
             Select-Object -ExpandProperty LastWriteTime -First 1
-        
+
         if (-not($lastWrite))
         {
             Write-Verbose -Message "No lastwrite time found. Setting to min date"

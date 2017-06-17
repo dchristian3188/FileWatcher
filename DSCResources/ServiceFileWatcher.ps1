@@ -8,6 +8,7 @@ class ServiceFileWatcher : BaseFileWatcher
 
     [Void]Set()
     {
+        Write-Verbose -Message "Restarting service [$($this.ServiceName)]"
         Restart-Service -Name $this.ServiceName -Force
     }
 
