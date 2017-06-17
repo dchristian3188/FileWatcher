@@ -1,3 +1,5 @@
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignments", "")]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingInvokeExpression", "")]
 [CmdletBinding()]
 param(
     [Parameter()]
@@ -36,6 +38,8 @@ Describe "$($ModuleName) Unit Tests" {
             It "$resource Creates a new object" {
                 {$fw = New-Object -TypeName $resource} | Should not throw
             }
+
+            It ""
         }
     }
 
