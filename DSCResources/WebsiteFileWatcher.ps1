@@ -1,4 +1,3 @@
-get-wmiobject -class win32_process -filter "name='w3wp.exe'" | Select-Object Name, ProcessId, @{n = 'AppPool'; e = {$_.GetOwner().user}}
 [DscResource()]
 class WebSiteFileWatcher : BaseFileWatcher
 {
@@ -9,25 +8,33 @@ class WebSiteFileWatcher : BaseFileWatcher
 
     [Void]Set()
     {
-        $runningProcs = Get-Process -Name $this.ProcessName -ErrorAction SilentlyContinue
-
-        If ($runningProcs)
-        {
-            Write-Verbose -Message "Stopping running Processes $($runningProcs.ID -join ', ')"
-            $runningProcs |
-                Stop-Process -ErrorAction Stop -Force
-        }
-
-        Write-Verbose -Message "Starting Process [$($this.ProcessName)] at path [$($this.ProcessPath)] with args [$($this.ProcessStartArgs)]"
-        Start-Process -FilePath $this.ProcessPath -ArgumentList $this.ProcessStartArgs -PassThru
+        $webInfo = Get-Website -Name $this.WebsiteName
+        Write-Verbose -Message "Restarting Application pool [$($webInfo.applicationPool)]"
+        Restart-WebAppPool -Name $webInfo.applicationPool
     }
 
     [DateTime]GetProcessStartTime()
     {
-        Write-Verbose -Message "Checking for process Name: $($this.ProcessName)"
-        $processInfo = (Get-CimInstance win32_process -Filter "name='$($this.ProcessName)'")
 
-        If ($processInfo.ProcessId -eq 0)
+        Write-Verbose -Message "Checking for Application pool running [$($this.WebsiteName)]"
+        $websiteInfo = Get-Website -Name $this.WebsiteName
+
+        if(-not($websiteInfo))
+        {
+            throw "Unable to find website $($this.WebsiteName)"
+        }
+
+        Write-Verbose -Message "Checking for process running applicaiton pool: $($websiteInfo.applicationPool)"
+
+        $AppPoolName = @{
+            Name       = 'AppPoolName'
+            Expression = {(Invoke-CimMethod -InputObject $PSItem -MethodName 'GetOwner').User}
+        }
+        $processInfo = (Get-CimInstance win32_process -Filter "name='w3wp.exe'") |
+            Select-Object *, $AppPoolName |
+            Where-Object -FilterScript {$PSItem.AppPoolName -eq $($websiteInfo.applicationPool)}
+
+        If (($processInfo.ProcessId -eq 0) -or $processInfo -eq $null)
         {
             Write-Verbose -Message "Could not find a running process, setting start time to min date value"
             $processStart = [datetime]::MinValue
@@ -39,5 +46,6 @@ class WebSiteFileWatcher : BaseFileWatcher
         }
         Return $processStart
     }
+
 
 }
