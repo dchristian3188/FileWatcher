@@ -90,9 +90,12 @@ task Pester {
     Invoke-Pester @{ Path = '.\Tests\*'; Parameters = $params} -OutputFile $resultFile -OutputFormat NUnitxml
 }
 
-task GenerateGraph -if (Test-Path -Path 'psgraph.ps1') {
-    $graphPath = Join-Path -Path $(Split-Path -Path $script:PsmPath) -ChildPath "$($script:ModuleName).png"
-    .\psgraph.ps1 -OutputPath $graphPath  -Quiet > $null
+task GenerateGraph -if (Test-Path -Path 'Graphs') {
+    $graphPath = Join-Path -Path $(Split-Path -Path $script:PsmPath) -ChildPath "ModuleFlow.png"
+    .\Graphs\MethodFlow.ps1 -OutputPath $graphPath  -Quiet > $null
+
+     $graphPath = Join-Path -Path $(Split-Path -Path $script:PsmPath) -ChildPath "PropertyFlow.png"
+     .\Graphs\PropertyFlow.ps1 -OutputPath $graphPath -Quiet -CompiledModule $script:PsmPath > $null
 }
 
 
